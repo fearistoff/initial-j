@@ -1,0 +1,82 @@
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Комплекты стеллажных систем</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="css" href="https://cdn.jsdelivr.net/gh/mailtoharshit/San-Francisco-Font-/sanfrancisco.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="./data/items.json"></script>
+    <script src="./data/materials.json"></script>
+  </head>
+
+  <body>
+    <div class="catalog" id="catalog">
+      <header class="catalog__header-block header">
+        <nav class="navigation">
+          <a class="navigation__link" href="#">Главная</a><span class="navigation__divider">/</span><a
+            class="navigation__link" href="#">Системы
+            хранения</a><span class="navigation__divider">/</span><a class="navigation__link navigation__link_current"
+            href="#">Комплекты стеллажных систем</a>
+        </nav>
+        <h1 class="header__main-text">Комплекты стеллажных систем</h1>
+        <div class="catalog__button button" @click="toggleMenu()">Фильтры и сортировка</div>
+      </header>
+      <main>
+        <aside v-if="sortingAndFilterShowing" class="catalog__select-list">
+          <div class="catalog__select select">
+            <span class="select__header">Сортировать по:</span>
+            <select class="select__input" v-model="sortingMode">
+              <option value="1">Цена по возрастанию</option>
+              <option value="2">Цена по убыванию</option>
+            </select>
+          </div>
+          <div class="catalog__select-check select-check">
+            <span class="select-check__header">Материал</span>
+            <div class="select-check__input" @click="toggleSelector()">
+              <span v-if="filterMode.length == 0">Нет фильтров</span>
+              <span v-for="(materialItem, index) in filterMode">
+                <span
+                  v-if="isInFilter(materialItem)">{{findFilterName(materialItem)}}{{index == (filterMode.length - 1) ? '' : ', '}}</span>
+              </span>
+            </div>
+            <div v-if="showSelector" class="select-check__option-container catalog__select-check__option-item">
+              <div class="select-check__option-item" v-for="materialItem in materialsList"
+                @click="toggleFilter(materialItem.id)">
+                {{materialItem.name}}
+              </div>
+            </div>
+          </div>
+        </aside>
+        <article class="catalog__block-list block-list">
+          <!-- массив блоков -->
+          <section v-for="catalogItem in updatedList" :key="catalogItem.id" class="block-list__goods-block goods-block">
+            <div class="goods-block__sale-mark" v-if="catalogItem.price.old_price">Скидка</div>
+            <img class="goods-block__image" :src="catalogItem.image.url" :alt="catalogItem.name">
+            <span class="goods-block__code"
+              :class="{'goods-block__code-empty': !catalogItem.code}">{{catalogItem.code || 'пусто'}}</span>
+            <h3 class="goods-block__header">{{catalogItem.name}}</h3>
+            <div class="goods-block__prices-block prices-block">
+              <span class="prices-block__old-price"
+                v-if="catalogItem.price.old_price">{{formatPrice(catalogItem.price.old_price)}}₽</span>
+              <span class="prices-block__current-price">{{formatPrice(catalogItem.price.current_price)}}₽</span>
+            </div>
+            <div class="goods-block__button goods-block__cart_none" @click="addCart(catalogItem.id)"
+              v-if="!checkInCart(catalogItem.id)"><img src="./pic/cart.svg" alt="Добавить в корзину"></div>
+            <div class="goods-block__button goods-block__cart_added" @click="removeCart(catalogItem.id)"
+              v-if="checkInCart(catalogItem.id)"><img src="./pic/check.svg" alt="В корзине"></div>
+            <div class="goods-block__button goods-block__favourite_none" @click="addFauvorites(catalogItem.id)"
+              v-if="!checkInFavourite(catalogItem.id)"><img src="./pic/fav-false.svg" alt="Добавить в избранное"></div>
+            <div class="goods-block__button goods-block__favourite_added" @click="removeFavourites(catalogItem.id)"
+              v-if="checkInFavourite(catalogItem.id)"><img src="./pic/fav-true.svg" alt="В избранном"></div>
+          </section>
+        </article>
+      </main>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+
+  </html>
